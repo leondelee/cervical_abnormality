@@ -243,7 +243,6 @@ class LabelTool():
         self.listbox.delete(0, self.listbox.size())
         for coor in self.json_data["class"]:
             [current_x, current_y, cls] = coor
-            print(self.classes)
             self.listbox.insert(END, '%d, %d, %d' % (current_x, current_y, cls))
             x1, y1 = (current_x - 5), (current_y - 5)
             x2, y2 = (current_x + 5), (current_y + 5)
@@ -272,7 +271,6 @@ class LabelTool():
         with open(self.json_file_name, 'w+') as f:
             f.write(json.dumps(self.json_data))
             f.close()
-        print(self.json_data)
         print('Image No. %d saved' % (self.cur))
         self.clearClass()
         self.clearBBox()
@@ -426,8 +424,3 @@ if __name__ == '__main__':
     tool = LabelTool(root)
     root.resizable(width =  True, height = True)
     root.mainloop()
-    # import json
-    # with open("test.json", 'r') as file:
-    #     i = file.read()
-    #     j = json.loads(i)
-    #     print(j)
