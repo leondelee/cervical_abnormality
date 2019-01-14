@@ -199,7 +199,7 @@ class LabelTool():
 
     def task_trans(self):
         self.task_type = self.MODE_TRANS
-        self.lb1 = Label(self.frame, text = '转化区')
+        self.lb1 = Label(self.frame, text = '已标注的转化区')
         self.lb1.grid(row = 3, column = 2,  sticky = W+N)
         self.task_btns.append(self.lb1)
         self.listbox = Listbox(self.frame, width = 22, height = 12)
@@ -224,7 +224,7 @@ class LabelTool():
 
     def task_class(self):
         self.task_type = self.MODE_DEGREE
-        self.lb1 = Label(self.frame, text='标注类别')
+        self.lb1 = Label(self.frame, text='已标注的类别')
         self.lb1.grid(row=3, column=2, sticky=W + N)
         self.task_btns.append(self.lb1)
         self.listbox = Listbox(self.frame, width=22, height=12)
@@ -272,8 +272,9 @@ class LabelTool():
             f.write(json.dumps(self.json_data))
             f.close()
         print('Image No. %d saved' % (self.cur))
-        self.clearClass()
-        self.clearBBox()
+        if self.task_type != None:
+            self.clearClass()
+            self.clearBBox()
 
     def mouseClick(self, event):
         if self.task_type == self.MODE_TRANS:
