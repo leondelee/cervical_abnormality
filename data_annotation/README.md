@@ -1,7 +1,7 @@
 ## 
 This tool is inspired by [NorrisWu](https://github.com/NorrisWu/BBox-Label-Tool-master).
 
-Author: Liangwei Li
+Author: [Liangwei Li](https://github.com/leondelee)
 
 Purpose: Data annotation
 ## Usage
