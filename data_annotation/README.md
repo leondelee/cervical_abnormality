@@ -10,7 +10,7 @@ You need install python3 on your PC.
 Choose a proper folder and type the following command in your terminal:
 
     git clone https://github.com/leondelee/cervical_abnormality
-    cd data/annotation
+    cd cervical_abnormality/data_annotation
     pip install -r requirements.txt
 
 Store your images under the folder "/Images/001". Make sure that images are of ".jpg" type.
