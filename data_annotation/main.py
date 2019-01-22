@@ -241,7 +241,7 @@ class LabelTool():
         self.btnClear.grid(row=6, column=2, sticky=W + E + N)
         self.task_btns.append(self.btnClear)
         self.loadImage()
-        # clear panel
+        ## clear panel
         for idx in range(len(self.bboxIdList)):
             self.mainPanel.delete(self.bboxIdList[idx])
         self.listbox.delete(0, self.listbox.size())
