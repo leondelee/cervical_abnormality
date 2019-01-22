@@ -12,7 +12,7 @@ import random
 import json
 
 # colors for the bboxes
-COLORS = ['red', 'blue', 'yellow', 'pink', 'cyan', 'green', 'black']
+COLORS = ['red', 'blue', 'yellow', 'pink', 'c', 'green', 'black']
 # image sizes for the examples
 SIZE = 256, 256
 NORMAL = 1
@@ -22,8 +22,13 @@ SEVERE_ANORMAL = 3
 class LabelTool():
     def __init__(self, master):
         # set up the main frame
+        self.width = 960
+        self.height = 780
+        self.img_start_x = 0
+        self.img_start_y = 0
         self.parent = master
         self.parent.title("LabelTool")
+        self.parent.geometry("{}x{}".format(self.width, self.height))
         self.frame = Frame(self.parent)
         self.frame.pack(fill=BOTH, expand=1)
         self.parent.resizable(width = FALSE, height = FALSE)
@@ -103,18 +108,21 @@ class LabelTool():
         # control panel for image navigation
         self.ctrPanel = Frame(self.frame)
         self.ctrPanel.grid(row = 5, column = 1, columnspan = 2, sticky = W+E)
-        self.prevBtn = Button(self.ctrPanel, text='<< Prev', width = 10, command = self.prevImage)
+        self.prevBtn = Button(self.ctrPanel, text='<< 上一张', width = 10, command = self.prevImage)
         self.prevBtn.pack(side = LEFT, padx = 5, pady = 3)
-        self.nextBtn = Button(self.ctrPanel, text='Next >>', width = 10, command = self.nextImage)
+        self.nextBtn = Button(self.ctrPanel, text='下一张 >>', width = 10, command = self.nextImage)
         self.nextBtn.pack(side = LEFT, padx = 5, pady = 3)
         self.progLabel = Label(self.ctrPanel, text = "Progress:     /    ")
         self.progLabel.pack(side = LEFT, padx = 5)
-        self.tmpLabel = Label(self.ctrPanel, text = "Go to Image No.")
+        self.tmpLabel = Label(self.ctrPanel, text = "前往图片 No.")
         self.tmpLabel.pack(side = LEFT, padx = 5)
         self.idxEntry = Entry(self.ctrPanel, width = 5)
         self.idxEntry.pack(side = LEFT)
         self.goBtn = Button(self.ctrPanel, text = 'Go', command = self.gotoImage)
         self.goBtn.pack(side = LEFT)
+        self.saveBtn = Button(self.ctrPanel, text='保存修改', width=10, command=self.saveCurrent)
+        self.saveBtn.pack(side=LEFT)
+        self.btnOrigColor = self.saveBtn.cget("background")
 
         self.disp = Label(self.ctrPanel, text='')
         self.disp.pack(side = RIGHT)
@@ -174,13 +182,6 @@ class LabelTool():
         self.draw_task_buttons()
         self.task_type = None
         self.loadImage()
-        if not os.path.exists(self.json_file_name):
-            with open(self.json_file_name, 'w+') as file:
-                file.write(json.dumps({"bbox": [], "class": []}))
-                file.close()
-        with open(self.json_file_name, 'r+') as file:
-            self.json_data = json.loads(file.read())
-            file.close()
     
     def task_btn_clear(self):
         if self.task_btns:
@@ -191,24 +192,26 @@ class LabelTool():
     def draw_task_buttons(self):
         self.operatePanel = Frame(self.frame)
         self.operatePanel.grid(row=1, column=2, sticky=W)
-        self.drawhBtn = Button(self.operatePanel, text='标注转化区', command=self.task_trans)
-        self.drawhBtn.grid(row=1, column=1, sticky=W)
+
+        self.transBtn = Button(self.operatePanel, text='标注转化区', command=self.task_trans)
+        self.transBtn.grid(row=1, column=1, sticky=W)
         self.operatePanel.grid(row=2, column=2, sticky=W)
-        self.drawhBtn = Button(self.operatePanel, text='标注类别', command=self.task_class)
-        self.drawhBtn.grid(row=1, column=3, sticky=W)
+        self.degreeBtn = Button(self.operatePanel, text='标注类别', command=self.task_class)
+        self.degreeBtn.grid(row=1, column=3, sticky=W)
 
     def task_trans(self):
         self.task_type = self.MODE_TRANS
+        self.changeButtonColor()
         self.lb1 = Label(self.frame, text = '已标注的转化区')
         self.lb1.grid(row = 3, column = 2,  sticky = W+N)
         self.task_btns.append(self.lb1)
         self.listbox = Listbox(self.frame, width = 22, height = 12)
         self.listbox.grid(row = 4, column = 2, sticky = N)
         self.task_btns.append(self.listbox)
-        self.btnDel = Button(self.frame, text = 'Delete', command = self.delBBox)
+        self.btnDel = Button(self.frame, text = '删除', command = self.delBBox)
         self.btnDel.grid(row = 5, column = 2, sticky = W+E+N)
         self.task_btns.append(self.btnDel)
-        self.btnClear = Button(self.frame, text = 'ClearAll', command = self.clearBBox)
+        self.btnClear = Button(self.frame, text = '清空所有', command = self.clearBBox)
         self.btnClear.grid(row = 6, column = 2, sticky = W+E+N)
         self.task_btns.append(self.btnClear)
         self.loadImage()
@@ -224,16 +227,17 @@ class LabelTool():
 
     def task_class(self):
         self.task_type = self.MODE_DEGREE
+        self.changeButtonColor()
         self.lb1 = Label(self.frame, text='已标注的类别')
         self.lb1.grid(row=3, column=2, sticky=W + N)
         self.task_btns.append(self.lb1)
         self.listbox = Listbox(self.frame, width=22, height=12)
         self.listbox.grid(row=4, column=2, sticky=N)
         self.task_btns.append(self.listbox)
-        self.btnDel = Button(self.frame, text='Delete', command=self.delClass)
+        self.btnDel = Button(self.frame, text='删除', command=self.delClass)
         self.btnDel.grid(row=5, column=2, sticky=W + E + N)
         self.task_btns.append(self.btnDel)
-        self.btnClear = Button(self.frame, text='ClearAll', command=self.clearClass)
+        self.btnClear = Button(self.frame, text='清空所有', command=self.clearClass)
         self.btnClear.grid(row=6, column=2, sticky=W + E + N)
         self.task_btns.append(self.btnClear)
         self.loadImage()
@@ -254,27 +258,66 @@ class LabelTool():
                 tmpId = self.mainPanel.create_oval(x1, y1, x2, y2, fill='red')
             self.class_points.append(tmpId)
 
+
     def loadImage(self):
         # load image
         imagepath = self.imageList[self.cur - 1]
         self.img = Image.open(imagepath)
         self.tkimg = ImageTk.PhotoImage(self.img)
         self.mainPanel.config(width = max(self.tkimg.width(), 400), height = max(self.tkimg.height(), 400))
-        self.mainPanel.create_image(0, 0, image = self.tkimg, anchor=NW)
+        self.mainPanel.create_image(self.img_start_x, self.img_start_y, image = self.tkimg, anchor=NW)
         self.progLabel.config(text = "%04d/%04d" %(self.cur, self.total))
-
         self.imagename = os.path.split(imagepath)[-1].split('.')[0]
         self.json_file_name = os.path.join(self.label_dir, self.imagename + '.json')
+        if not os.path.exists(self.json_file_name):
+            with open(self.json_file_name, 'w+') as file:
+                file.write(json.dumps({"bbox": [], "class": []}))
+                file.close()
+        with open(self.json_file_name, 'r+') as file:
+            self.json_data = json.loads(file.read())
+            file.close()
 
-    def saveImage(self):
+
+    def saveImage(self, finished=True):
         import json
         with open(self.json_file_name, 'w+') as f:
             f.write(json.dumps(self.json_data))
             f.close()
-        print('Image No. %d saved' % (self.cur))
-        if self.task_type != None:
+        # print('Image No. %d saved' % (self.cur))
+        self.deleteJson()
+
+        if self.task_type != None and finished:
             self.clearClass()
             self.clearBBox()
+
+    def saveCurrent(self):
+        if self.json_file_name != '':
+            import json
+            with open(self.json_file_name, 'w+') as f:
+                f.write(json.dumps(self.json_data))
+                f.close()
+            # print('Image No. %d saved' % (self.cur))
+            self.deleteJson()
+
+    def deleteJson(self):
+        delete_flag = True
+        for key in self.json_data:
+            if self.json_data[key]:
+                delete_flag = False
+        if delete_flag and self.json_file_name:
+            os.remove(self.json_file_name)
+
+    def changeButtonColor(self):
+        if self.task_type == self.MODE_TRANS:
+            self.degreeBtn.configure(bg=self.btnOrigColor)
+            self.transBtn.configure(bg='red')
+        elif self.task_type == self.MODE_DEGREE:
+            self.transBtn.configure(bg=self.btnOrigColor)
+            self.degreeBtn.configure(bg='red')
+        else:
+            self.transBtn.configure(bg=self.btnOrigColor)
+            self.degreeBtn.configure(bg=self.btnOrigColor)
+
 
     def mouseClick(self, event):
         if self.task_type == self.MODE_TRANS:
@@ -333,6 +376,7 @@ class LabelTool():
             btn3 = Button(self.frame, text=labels[2], command=on_click_label3)
             btn3.place(x=current_x + 5, y=current_y + 30 * 2, height=30)
             self.class_btns.append(btn3)
+        self.saveImage(False)
 
     def mouseMove(self, event):
         self.disp.config(text = 'x: %d, y: %d' %(event.x, event.y))
@@ -358,12 +402,12 @@ class LabelTool():
 
     def delBBox(self):
         sel = self.listbox.curselection()
-        if len(sel) != 1 :
+        if len(sel) != 1:
             return
         idx = int(sel[0])
         self.mainPanel.delete(self.bboxIdList[idx])
         self.bboxIdList.pop(idx)
-        self.bboxList.pop(idx)
+        # self.bboxList.pop(idx)
         if self.listbox.size():
             self.listbox.delete(idx)
         self.json_data["bbox"].pop(idx)
@@ -387,7 +431,6 @@ class LabelTool():
         idx = int(sel[0])
         self.mainPanel.delete(self.class_points[idx])
         self.class_points.pop(idx)
-        self.classes.pop(idx)
         if self.listbox.size():
             self.listbox.delete(idx)
         self.json_data["class"].pop(idx)
