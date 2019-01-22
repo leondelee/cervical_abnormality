@@ -12,8 +12,8 @@ Run
 Store your images under the folder "/Images/001" or ""/Images/002" or ... . Make sure that images are of ".jpg" type.
 
 
-Type "1" in the input box, which means the pictures to be handled situate in the folder ".\Images\001". Corresponding Json files
-can be found in the folder "\Labels\001".
+Type "1" in the input box, which means the pictures to be handled situate in the folder "./Images/001". Corresponding Json files
+can be found in the folder "/Labels/001".
 
 ## Changing Logs
 ### 2019/01/22
