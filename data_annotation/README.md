@@ -1,19 +1,23 @@
+## 
+This tool is inspired by [NorrisWu](https://github.com/NorrisWu/BBox-Label-Tool-master).
+Author: Liangwei Li
+Purpose: Data annotation
 ## Usage
-python3
+You need install python3 on your PC.
 
-cd into the folder data_annotation and run:
+Choose a proper folder and type the following command in your terminal:
 
+    git clone https://github.com/leondelee/cervical_abnormality
+    cd data/annotation
     pip install -r requirements.txt
 
-Run
+Store your images under the folder "/Images/001". Make sure that images are of ".jpg" type.
+
+Then run the application by:
 
     python main.py
-    
-Store your images under the folder "/Images/001" or ""/Images/002" or ... . Make sure that images are of ".jpg" type.
-
-
-Type "1" in the input box, which means the pictures to be handled situate in the folder "./Images/001". Corresponding Json files
-can be found in the folder "/Labels/001".
+   
+Normally, a GUI window should show up. Type "1" in the input box, which means the pictures to be handled situate in the folder "./Images/001". Corresponding Json files can be found in the folder "/Labels/001".
 
 ## Changing Logs
 ### 2019/01/22
