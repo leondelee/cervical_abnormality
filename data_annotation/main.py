@@ -146,7 +146,7 @@ class LabelTool():
         self.label_dir = "./Labels/%03d/" %self.category
         if not os.path.exists(self.label_dir):
             os.mkdir(self.label_dir)
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.JPEG'))
+        self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
 
         if len(self.imageList) == 0:
             print ('No .JPEG images found in the specified dir!')
@@ -160,7 +160,7 @@ class LabelTool():
         # self.egDir = os.path.join(r'./Examples', '%03d' %(self.category))
         # if not os.path.exists(self.egDir):
         #     return
-        filelist = glob.glob(os.path.join(self.egDir, '*.JPEG'))
+        filelist = glob.glob(os.path.join(self.egDir, '*.jpg'))
         self.tmp = []
         self.egList = []
         random.shuffle(filelist)
