@@ -2,6 +2,7 @@
 This tool is inspired by [NorrisWu](https://github.com/NorrisWu/BBox-Label-Tool-master).
 
 Author: Liangwei Li
+
 Purpose: Data annotation
 ## Usage
 You need install python3 on your PC.
