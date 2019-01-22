@@ -5,7 +5,7 @@ Author: Liangwei Li
 
 Purpose: Data annotation
 ## Usage
-You need install python3 on your PC.
+You need python3 installed on your PC.
 
 Choose a proper folder and type the following command in your terminal:
 
