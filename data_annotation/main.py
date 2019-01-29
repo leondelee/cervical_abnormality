@@ -12,7 +12,7 @@ import random
 import json
 
 # colors for the bboxes
-COLORS = ['red', 'blue', 'yellow', 'pink', 'c', 'green', 'black']
+COLORS = ['red', 'blue', 'yellow', 'pink', 'green', 'black']
 # image sizes for the examples
 SIZE = 256, 256
 NORMAL = 1
