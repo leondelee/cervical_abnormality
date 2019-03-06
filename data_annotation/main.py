@@ -13,8 +13,9 @@ import json
 
 # colors for the bboxes
 COLORS = ['red', 'blue', 'yellow', 'pink', 'green', 'black']
+CLS_NAME = ["正常", "轻微异常", "严重异常"]
 # image sizes for the examples
-SIZE = 256, 256
+SIZE = (1400, 960)
 NORMAL = 1
 SLIGHT_ANORMAL = 2
 SEVERE_ANORMAL = 3
@@ -22,8 +23,8 @@ SEVERE_ANORMAL = 3
 class LabelTool():
     def __init__(self, master):
         # set up the main frame
-        self.width = 960
-        self.height = 780
+        self.width = SIZE[0]
+        self.height = SIZE[1]
         self.img_start_x = 0
         self.img_start_y = 0
         self.parent = master
@@ -125,7 +126,7 @@ class LabelTool():
         self.btnOrigColor = self.saveBtn.cget("background")
 
         self.disp = Label(self.ctrPanel, text='')
-        self.disp.pack(side = RIGHT)
+        self.disp.pack(side = LEFT)
 
         self.frame.columnconfigure(1, weight = 1)
         self.frame.rowconfigure(4, weight = 1)
@@ -149,7 +150,7 @@ class LabelTool():
         self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
 
         if len(self.imageList) == 0:
-            print ('No .JPEG images found in the specified dir!')
+            print ('No .jpg images found in the specified dir!')
             return
 
         # default to the 1st image in the collection
@@ -157,22 +158,22 @@ class LabelTool():
         self.total = len(self.imageList)
 
         # load example bboxes
-        # self.egDir = os.path.join(r'./Examples', '%03d' %(self.category))
-        # if not os.path.exists(self.egDir):
-        #     return
+        self.egDir = os.path.join(r'./Images', '%03d' %(self.category))
+        if not os.path.exists(self.egDir):
+             return
         filelist = glob.glob(os.path.join(self.egDir, '*.jpg'))
         self.tmp = []
         self.egList = []
         random.shuffle(filelist)
-        for (i, f) in enumerate(filelist):
-            if i == 3:
-                break
-            im = Image.open(f)
-            r = min(SIZE[0] / im.size[0], SIZE[1] / im.size[1])
-            new_size = int(r * im.size[0]), int(r * im.size[1])
-            self.tmp.append(im.resize(new_size, Image.ANTIALIAS))
-            self.egList.append(ImageTk.PhotoImage(self.tmp[-1]))
-            self.egLabels[i].config(image = self.egList[-1], width = SIZE[0], height = SIZE[1])
+        # for (i, f) in enumerate(filelist):
+        #     # if i == 3:
+        #     #     break
+        #     im = Image.open(f)
+        #     r = min(SIZE[0] / im.size[0], SIZE[1] / im.size[1])
+        #     new_size = (int(r * im.size[0]), int(r * im.size[1]))
+        #     self.tmp.append(im.resize(new_size, Image.ANTIALIAS))
+        #     self.egList.append(ImageTk.PhotoImage(self.tmp[-1]))
+        #     # self.egLabels[i].config(image = self.egList[-1], width = SIZE[0], height = SIZE[1])
 
         self.new_picture()
         print ('%d images loaded from %s' %(self.total, s))
@@ -200,6 +201,7 @@ class LabelTool():
         self.degreeBtn.grid(row=1, column=3, sticky=W)
 
     def task_trans(self):
+        self.saveCurrent()
         self.task_type = self.MODE_TRANS
         self.changeButtonColor()
         self.lb1 = Label(self.frame, text = '已标注的转化区')
@@ -226,6 +228,7 @@ class LabelTool():
             self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (tmp[0], tmp[1], tmp[2], tmp[3]))
 
     def task_class(self):
+        self.saveCurrent()
         self.task_type = self.MODE_DEGREE
         self.changeButtonColor()
         self.lb1 = Label(self.frame, text='已标注的类别')
@@ -247,7 +250,7 @@ class LabelTool():
         self.listbox.delete(0, self.listbox.size())
         for coor in self.json_data["class"]:
             [current_x, current_y, cls] = coor
-            self.listbox.insert(END, '%d, %d, %d' % (current_x, current_y, cls))
+            self.listbox.insert(END, "{}, {}, {}".format(current_x, current_y, CLS_NAME[cls - 1]))
             x1, y1 = (current_x - 5), (current_y - 5)
             x2, y2 = (current_x + 5), (current_y + 5)
             if cls == NORMAL:
@@ -263,6 +266,7 @@ class LabelTool():
         # load image
         imagepath = self.imageList[self.cur - 1]
         self.img = Image.open(imagepath)
+        self.img = self.img.resize(SIZE, Image.ANTIALIAS)
         self.tkimg = ImageTk.PhotoImage(self.img)
         self.mainPanel.config(width = max(self.tkimg.width(), 400), height = max(self.tkimg.height(), 400))
         self.mainPanel.create_image(self.img_start_x, self.img_start_y, image = self.tkimg, anchor=NW)
@@ -405,24 +409,28 @@ class LabelTool():
         if len(sel) != 1:
             return
         idx = int(sel[0])
+        print(idx)
         self.mainPanel.delete(self.bboxIdList[idx])
         self.bboxIdList.pop(idx)
         # self.bboxList.pop(idx)
         if self.listbox.size():
             self.listbox.delete(idx)
         self.json_data["bbox"].pop(idx)
+        self.task_trans()
 
     def clearBBox(self):
         for idx in range(len(self.bboxIdList)):
             self.mainPanel.delete(self.bboxIdList[idx])
         self.listbox.delete(0, self.listbox.size())
         self.json_data["bbox"] = []
+        self.task_trans()
 
     def clearClass(self):
         for idx in range(len(self.class_points)):
             self.mainPanel.delete(self.class_points[idx])
         self.listbox.delete(0, self.listbox.size())
         self.json_data["class"] = []
+        self.task_class()
 
     def delClass(self):
         sel = self.listbox.curselection()
@@ -434,9 +442,10 @@ class LabelTool():
         if self.listbox.size():
             self.listbox.delete(idx)
         self.json_data["class"].pop(idx)
+        self.task_class()
 
     def prevImage(self, event = None):
-        self.saveImage()
+        self.saveImage(False)
         if self.cur > 1:
             self.cur -= 1
             self.new_picture()
@@ -445,7 +454,7 @@ class LabelTool():
             self.new_picture()
 
     def nextImage(self, event = None):
-        self.saveImage()
+        self.saveImage(False)
         self.task_btn_clear()
         self.task_type = None
         if self.cur < self.total:
@@ -456,7 +465,7 @@ class LabelTool():
             self.new_picture()
 
     def gotoImage(self):
-        self.saveImage()
+        self.saveImage(False)
         idx = int(self.idxEntry.get())
         if 1 <= idx and idx <= self.total:
             self.cur = idx
