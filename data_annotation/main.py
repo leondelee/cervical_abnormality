@@ -16,6 +16,7 @@ COLORS = ['red', 'blue', 'yellow', 'pink', 'green', 'black']
 CLS_NAME = ["正常", "轻微异常", "严重异常"]
 # image sizes for the examples
 SIZE = (1400, 960)
+RESIZE_RATE = 0.8
 NORMAL = 1
 SLIGHT_ANORMAL = 2
 SEVERE_ANORMAL = 3
@@ -266,7 +267,8 @@ class LabelTool():
         # load image
         imagepath = self.imageList[self.cur - 1]
         self.img = Image.open(imagepath)
-        self.img = self.img.resize(SIZE, Image.ANTIALIAS)
+        new_size = (int(self.img.size[0] * RESIZE_RATE), int(self.img.size[1] * RESIZE_RATE))
+        self.img = self.img.resize(new_size, Image.ANTIALIAS)
         self.tkimg = ImageTk.PhotoImage(self.img)
         self.mainPanel.config(width = max(self.tkimg.width(), 400), height = max(self.tkimg.height(), 400))
         self.mainPanel.create_image(self.img_start_x, self.img_start_y, image = self.tkimg, anchor=NW)
@@ -474,6 +476,7 @@ class LabelTool():
 
 if __name__ == '__main__':
     root = Tk()
+    root.state("zoomed")
     tool = LabelTool(root)
     root.resizable(width =  True, height = True)
     root.mainloop()
