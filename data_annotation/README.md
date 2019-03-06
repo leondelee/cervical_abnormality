@@ -1,9 +1,5 @@
-## 
-This tool is inspired by [NorrisWu](https://github.com/NorrisWu/BBox-Label-Tool-master).
-
-Author: [Liangwei Li](https://github.com/leondelee)
-
-Purpose: Data annotation
+## Purpose
+Data annotation
 ## Usage
 You need python3 installed on your PC.
 
