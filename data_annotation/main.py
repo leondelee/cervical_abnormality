@@ -5,6 +5,7 @@
 #-------------------------------------------------------------------------------
 from __future__ import division
 from tkinter import *
+from tkinter import ttk
 from PIL import Image, ImageTk
 import os
 import glob
@@ -77,8 +78,11 @@ class LabelTool():
         # dir entry & load
         self.label = Label(self.frame, text = "Image Dir:")
         self.label.grid(row = 0, column = 0, sticky = E)
-        self.entry = Entry(self.frame)
-        self.entry.grid(row = 0, column = 1, sticky = W+E)
+        self.cbx= ttk.Combobox(self.frame, width = 12, height = 8, textvariable = int)
+        self.cbx.grid(row = 0, column = 1, sticky = W+E)
+        self.pwd = os.getcwd()
+        self.mylist=os.listdir(self.pwd+'.\Images')
+        self.cbx["values"] =self.mylist
         self.ldBtn = Button(self.frame, text = "Load", command = self.loadDir)
         self.ldBtn.grid(row = 0, column = 2, sticky = W+E)
         self.label_dir = ""
@@ -132,10 +136,11 @@ class LabelTool():
         self.frame.columnconfigure(1, weight = 1)
         self.frame.rowconfigure(4, weight = 1)
         self.json_file_name = ""
+        
 
     def loadDir(self, dbg = False):
         if not dbg:
-            s = self.entry.get()
+            s = self.cbx.get()
             self.parent.focus()
             self.category = int(s)
         else:
