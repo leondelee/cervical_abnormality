@@ -25,3 +25,7 @@ Normally, a GUI window should show up. Type "1" in the input box, which means th
  - make the "标注转化区" and "标注类别" buttons' colors chageable according to current situation
  - adjust canvas's size
 
+### 2019/03/11
+
+ - add select list for Images folder
+
