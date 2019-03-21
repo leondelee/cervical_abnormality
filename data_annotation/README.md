@@ -29,3 +29,7 @@ Normally, a GUI window should show up. Type "1" in the input box, which means th
 
  - add select list for Images folder
 
+### 2019/03/21
+ - merge task trans and task class
+ - fix some bugs relating to deletion
+
