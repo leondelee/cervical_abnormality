@@ -6,21 +6,6 @@ import cv2
 import numpy as np
 
 
-path = "../data/cervical_data_with_vgg/vinegar/vinegar"
-test_path = os.path.join(path, "test")
-train_path = os.path.join(path, "train")
-val_path = os.path.join(path, "validation")
-
-
-def get_image_dir(cat="train", type="2"):
-    if cat == "train":
-        return os.path.join(train_path, type)
-    elif cat == "test":
-        return os.path.join(test_path, type)
-    else:
-        return os.path.join(val_path, type)
-
-
 def get_image_path(dir, image):
     return os.path.join(dir, image)
 
