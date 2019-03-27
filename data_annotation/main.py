@@ -27,6 +27,7 @@ RESIZE_RATE = 0.8
 NORMAL = 1
 SLIGHT_ANORMAL = 2
 SEVERE_ANORMAL = 3
+PRE_SIZE = 7
 
 
 class LabelTool():
@@ -74,10 +75,17 @@ class LabelTool():
         self.class_btns = []  # class btns
         self.class_points = []  # class points on the picture
         self.current_class = None
-
+        
+        # reference to class
+        self.pre = []  # classes information
+        self.pre_btns = []  # class btns
+        self.pre_points = []  # class points on the picture
+        self.current_class = None
+        
         # task info
         self.MODE_TRANS = 0
         self.MODE_DEGREE = 1
+        self.MODE_PRE = 2
         self.task_type = None
         self.task_btns = []
 
@@ -206,38 +214,43 @@ class LabelTool():
         self.operatePanel = Frame(self.frame)
         self.operatePanel.grid(row=1, column=2, sticky=W)
 
-        # self.transBtn = Button(self.operatePanel, text='不要点', command=self.task_trans)
-        # self.transBtn.grid(row=1, column=1, sticky=W)
+        self.PreBtn = Button(self.operatePanel, text='预处理', command=self.task_Pre)
+        self.PreBtn.grid(row=1, column=1, sticky=W)
         self.operatePanel.grid(row=2, column=2, sticky=W)
         self.degreeBtn = Button(self.operatePanel, text='标注类别', command=self.task_class)
         self.degreeBtn.grid(row=1, column=3, sticky=W)
-
-    def task_trans(self):
+    
+    def task_Pre(self):
         self.saveCurrent()
-        self.task_type = self.MODE_TRANS
+        self.task_type = self.MODE_PRE
         self.changeButtonColor()
-        self.lb1 = Label(self.frame, text='已标注的转化区')
+        self.lb1 = Label(self.frame, text='裁剪区')
         self.lb1.grid(row=3, column=2, sticky=W + N)
         self.task_btns.append(self.lb1)
         self.listbox = Listbox(self.frame, width=22, height=12)
         self.listbox.grid(row=4, column=2, sticky=N)
         self.task_btns.append(self.listbox)
-        self.btnDel = Button(self.frame, text='删除', command=self.delBBox)
+        self.btnDel = Button(self.frame, text='删除', command=self.delPre)
         self.btnDel.grid(row=5, column=2, sticky=W + E + N)
         self.task_btns.append(self.btnDel)
-        self.btnClear = Button(self.frame, text='清空所有', command=self.clearBBox)
+        self.btnClear = Button(self.frame, text='清空所有', command=self.clearPre)
         self.btnClear.grid(row=6, column=2, sticky=W + E + N)
         self.task_btns.append(self.btnClear)
         self.loadImage()
-        # clear panel
-        for idx in range(len(self.class_points)):
-            self.mainPanel.delete(self.class_points[idx])
+        ## clear panel
+        for idx in range(len(self.bboxIdList)):
+            self.mainPanel.delete(self.bboxIdList[idx])
         self.listbox.delete(0, self.listbox.size())
-        for tmp in self.json_data["bbox"]:
-            tmpId = self.mainPanel.create_rectangle(tmp[0], tmp[1], tmp[2], tmp[3], width=2,
-                                                    outline=COLORS[(len(self.json_data["bbox"]) - 1) % len(COLORS)])
-            self.bboxIdList.append(tmpId)
-            self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (tmp[0], tmp[1], tmp[2], tmp[3]))
+        for coor in self.json_data["pre"]:
+            [current_x, current_y] = coor
+            self.listbox.insert(END, "{}, {}".format(current_x, current_y))
+            x1, y1 = (current_x - PRE_SIZE), (current_y - PRE_SIZE)
+            x2, y2 = (current_x + PRE_SIZE), (current_y + PRE_SIZE)
+            tmpId = self.mainPanel.create_rectangle(x1, y1, x2,y2, width=2,
+                                                     outline='black')
+            self.pre_points.append(tmpId)
+
+   
 
     def task_class(self):
         self.saveCurrent()
@@ -281,7 +294,7 @@ class LabelTool():
         self.json_file_name = os.path.join(self.label_dir, self.imagename + '.json')
         if not os.path.exists(self.json_file_name):
             with open(self.json_file_name, 'w+') as file:
-                file.write(json.dumps({"bbox": [], "class": []}))
+                file.write(json.dumps({"bbox": [], "class": [],"pre":[]}))
                 file.close()
         with open(self.json_file_name, 'r+') as file:
             self.json_data = json.loads(file.read())
@@ -298,6 +311,7 @@ class LabelTool():
         if self.task_type != None and finished:
             self.clearClass()
             self.clearBBox()
+            self.clearPre()
 
     def saveCurrent(self):
         if self.json_file_name != '':
@@ -323,6 +337,8 @@ class LabelTool():
         elif self.task_type == self.MODE_DEGREE:
             # self.transBtn.configure(bg=self.btnOrigColor)
             self.degreeBtn.configure(bg='red')
+        elif self.task_type == self.MODE_PRE:
+            self.PreBtn.configure(bg=self.btnOrigColor)   
         else:
             # self.transBtn.configure(bg=self.btnOrigColor)
             self.degreeBtn.configure(bg=self.btnOrigColor)
@@ -385,17 +401,18 @@ class LabelTool():
             #                 self.listbox.insert(END, '(%d, %d) -> (%d, %d)' %(x1, y1, x2, y2))
             #                 self.json_data["bbox"].append([x1, y1, x2, y2])
             self.STATE['click'] = 1 - self.STATE['click']
-        # elif self.task_type == self.MODE_TRANS:
-        #     if self.STATE['click'] == 0:
-        #         self.STATE['x'], self.STATE['y'] = event.x, event.y
-        #     else:
-        #         x1, x2 = min(self.STATE['x'], event.x), max(self.STATE['x'], event.x)
-        #         y1, y2 = min(self.STATE['y'], event.y), max(self.STATE['y'], event.y)
-        #         self.bboxIdList.append(self.bboxId)
-        #         self.bboxId = None
-        #         self.listbox.insert(END, '(%d, %d) -> (%d, %d)' % (x1, y1, x2, y2))
-        #         self.json_data["bbox"].append([x1, y1, x2, y2])
-        #     self.STATE['click'] = 1 - self.STATE['click']
+            
+            
+        elif self.task_type == self.MODE_PRE:
+            current_x, current_y = event.x, event.y
+            self.json_data["pre"].append([current_x, current_y])
+            self.listbox.insert(END, '%d, %d' %(current_x, current_y))
+            x1, y1 = (current_x - PRE_SIZE), (current_y - PRE_SIZE)
+            x2, y2 = (current_x + PRE_SIZE), (current_y + PRE_SIZE)
+            tmpId = self.mainPanel.create_rectangle(x1, y1, x2,y2, width=2,
+                                                     outline='black')
+            self.pre_points.append(tmpId)
+            
         self.saveImage(False)
 
     def mouseMove(self, event):
@@ -459,6 +476,25 @@ class LabelTool():
             self.listbox.delete(idx)
         self.json_data["class"].pop(idx)
         self.task_class()
+        
+    def clearPre(self):
+        for idx in range(len(self.pre_points)):
+            self.mainPanel.delete(self.pre_points[idx])
+        self.listbox.delete(0, self.listbox.size())
+        self.json_data["pre"] = []
+        self.task_Pre()
+        
+    def delPre(self):
+        sel = self.listbox.curselection()
+        if len(sel) != 1:
+            return
+        idx = int(sel[0])
+        self.mainPanel.delete(self.pre_points[idx])
+        self.pre_points.pop(idx)
+        if self.listbox.size():
+            self.listbox.delete(idx)
+        self.json_data["pre"].pop(idx)
+        self.task_Pre()
 
     def prevImage(self, event=None):
         self.saveImage(False)
