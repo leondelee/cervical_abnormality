@@ -1,2 +1,5 @@
 *.idea/
 venv/
+*.zip
+*.jpg
+*.pyc
