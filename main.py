@@ -30,10 +30,16 @@ if __name__ == '__main__':
         model_flag = check_previous_models()                       # check if there exist previous models
         if model_flag != None:
             model.load(model_flag)
+    else:
+        previous_logs = os.listdir(LOG_PATH)
+        for log in previous_logs:
+            os.unlink(LOG_PATH + log)
 
     # load_data
     type_name = ["vinegar"]
-    train_dic = val_dic = test_dic = {}
+    train_dic = {}
+    val_dic = {}
+    test_dic = {}
     for idx, name in enumerate(type_name):
         train_dic[name] = [DataSet(data_type="train", label=k, annotation_type=idx) for k in range(NUM_CLASSES)]
         val_dic[name] = [DataSet(data_type="validation", label=k, annotation_type=idx) for k in range(NUM_CLASSES)]
@@ -52,7 +58,7 @@ if __name__ == '__main__':
         optimizer=optimizer,
         dataset=train_data,
         val_dataset=val_data,
-        metric=f1_score
+        metric=accuracy_score
     )
 
     train(trainer)
