@@ -37,11 +37,12 @@ LEVEL_FOLDER = os.listdir(os.path.join(DATA_PATH, "train/vinegar"))
 BATCH_SIZE = 4
 LOAD_DATA_WORKERS = 4
 TIME_FORMAT = "%m_%d_%H:%M:%S"
-MAX_EPOCH = 200
+MAX_EPOCH = 500
 USE_GPU = True
 LEARNING_RATE = 1e-4
 WEIGHT_DECAY = 0.99
-UPDATE_FREQ = MAX_EPOCH / 10
+UPDATE_FREQ = 10
+MODEl_SAVE = False
 
 
 if __name__ == '__main__':

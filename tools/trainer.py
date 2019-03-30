@@ -76,8 +76,9 @@ class Trainer:
             print('Epoch', epoch)
             self.step_one_epoch()
             self.call_plugins('epoch', epoch)
-            if epoch % UPDATE_FREQ == 0:
-                self.model.save()
+            if (epoch + 1) % UPDATE_FREQ == 0:
+                if MODEl_SAVE:
+                    self.model.save()
                 log_content = 'Loss at epoch {epoch} is {loss}.\n'.format(
                     epoch=epoch,
                     loss=self.loss,
