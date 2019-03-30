@@ -4,7 +4,7 @@
 # In[2]:
 
 
-from data_loader import *
+from data.data_loader import *
 x,y = load_image_svm(input_size = 540)
 train_x,test_x,train_y,test_y = train_test_split(x,y,test_size=0.2)
 clf = SVC(kernel='linear',C=1,gamma = "auto")

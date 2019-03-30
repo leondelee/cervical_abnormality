@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Author: llw
 import os
 import sys
@@ -47,3 +48,18 @@ UPDATE_FREQ = MAX_EPOCH / 10
 if __name__ == '__main__':
     print(os.path.dirname(os.path.realpath(__file__)))
 
+=======
+# Author: llw
+# path information
+DATA_PATH = "./data"
+
+# image information
+VINEGAR = 0
+IODINE = 1
+# disease level
+LEVEL0 = 0
+LEVEL1 = 1
+LEVEL2 = 2
+LEVEL3 = 3
+
+>>>>>>> 2b500899745e07b566f5f8132170cf74be21622e

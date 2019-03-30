@@ -10,6 +10,12 @@ def get_image_path(dir, image):
     return os.path.join(dir, image)
 
 
+def show_image(image):
+    cv2.imshow("image", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 def get_image_array(filename):
     return cv2.imread(filename)
 

@@ -35,7 +35,7 @@ def plot_2d_data(data, labels):
     import matplotlib.pyplot as plt
     for cor in set(labels):
         mask = (labels == cor)
-        if cor == 5:
+        if cor == 9:
             plt.scatter(
                 data[mask, 0],
                 data[mask, 1],

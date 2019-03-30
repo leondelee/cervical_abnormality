@@ -4,7 +4,8 @@
 # In[1]:
 
 
-from model import VGG16,Resnet50,Diynet,codingnet
+from model.model import VGG16
+
 #check model parameters
 model = VGG16(input_length=540, input_width=540)
 #model = Resnet50()
@@ -16,7 +17,6 @@ model.summary()
 # In[2]:
 
 
-import keras
 from keras import optimizers
 sgd = optimizers.SGD(lr=0.0005, decay=1e-5, momentum=0.9, nesterov=True)
 #ada = keras.optimizers.Adagrad(lr=0.01, epsilon=1e-06)
@@ -28,11 +28,10 @@ model.compile(loss='categorical_crossentropy',
 # In[3]:
 
 
-from data_loader import *
+from data.data_loader import *
 #run model
 import tensorflow as tf
-import os 
-from keras.metrics import top_k_categorical_accuracy
+import os
 
 batch_size = 1
 
