@@ -9,7 +9,7 @@ from torchvision import transforms as TM
 
 # TODO :from tools.image_preprocess import transform
 from config import *
-from tools.tools import dense_to_one_hot
+from tools.tools import show_image
 
 
 def get_transformer():
@@ -92,4 +92,4 @@ if __name__ == '__main__':
     print(ds.size())
     ds = load_data([ds, ds])
     for idx, i in enumerate(ds):
-        print(i[1])
+        print(i[0].shape)
