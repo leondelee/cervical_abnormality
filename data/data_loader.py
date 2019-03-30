@@ -93,4 +93,3 @@ if __name__ == '__main__':
     ds = load_data([ds, ds])
     for idx, i in enumerate(ds):
         print(i[1])
-
