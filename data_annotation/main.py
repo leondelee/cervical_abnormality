@@ -27,7 +27,7 @@ RESIZE_RATE = 0.8
 NORMAL = 1
 SLIGHT_ANORMAL = 2
 SEVERE_ANORMAL = 3
-PRE_SIZE = 7
+PRE_SIZE = 100
 
 
 class LabelTool():
@@ -243,6 +243,8 @@ class LabelTool():
         self.listbox.delete(0, self.listbox.size())
         for coor in self.json_data["pre"]:
             [current_x, current_y] = coor
+            current_x = current_x*self.tkimg.width()
+            current_y = current_y*self.tkimg.height()
             self.listbox.insert(END, "{}, {}".format(current_x, current_y))
             x1, y1 = (current_x - PRE_SIZE), (current_y - PRE_SIZE)
             x2, y2 = (current_x + PRE_SIZE), (current_y + PRE_SIZE)
@@ -405,12 +407,11 @@ class LabelTool():
             
         elif self.task_type == self.MODE_PRE:
             current_x, current_y = event.x, event.y
-            self.json_data["pre"].append([current_x, current_y])
+            self.json_data["pre"].append([current_x/self.tkimg.width(), current_y/self.tkimg.height()])
             self.listbox.insert(END, '%d, %d' %(current_x, current_y))
             x1, y1 = (current_x - PRE_SIZE), (current_y - PRE_SIZE)
             x2, y2 = (current_x + PRE_SIZE), (current_y + PRE_SIZE)
-            tmpId = self.mainPanel.create_rectangle(x1, y1, x2,y2, width=2,
-                                                     outline='black')
+            tmpId = self.mainPanel.create_rectangle(x1, y1, x2,y2, width=2,outline='black')
             self.pre_points.append(tmpId)
             
         self.saveImage(False)
