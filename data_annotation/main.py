@@ -28,6 +28,8 @@ NORMAL = 1
 SLIGHT_ANORMAL = 2
 SEVERE_ANORMAL = 3
 PRE_SIZE = 100
+# available image formats
+FORMATS = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
 
 
 class LabelTool():
@@ -167,10 +169,14 @@ class LabelTool():
         self.label_dir = "./Labels/%03d/" % self.category
         if not os.path.exists(self.label_dir):
             os.mkdir(self.label_dir)
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.jpg'))
-
+        # load images
+        self.imageList = []
+        for format in FORMATS:
+            images = glob.glob(os.path.join(self.imageDir, format))
+            if len(images):
+                self.imageList.extend(images)
         if len(self.imageList) == 0:
-            print('No .jpg images found in the specified dir!')
+            print('No images found in the specified dir!')
             return
 
         # default to the 1st image in the collection
@@ -185,15 +191,6 @@ class LabelTool():
         self.tmp = []
         self.egList = []
         random.shuffle(filelist)
-        # for (i, f) in enumerate(filelist):
-        #     # if i == 3:
-        #     #     break
-        #     im = Image.open(f)
-        #     r = min(SIZE[0] / im.size[0], SIZE[1] / im.size[1])
-        #     new_size = (int(r * im.size[0]), int(r * im.size[1]))
-        #     self.tmp.append(im.resize(new_size, Image.ANTIALIAS))
-        #     self.egList.append(ImageTk.PhotoImage(self.tmp[-1]))
-        #     # self.egLabels[i].config(image = self.egList[-1], width = SIZE[0], height = SIZE[1])
 
         self.new_picture()
         print('%d images loaded from %s' % (self.total, s))
