@@ -178,6 +178,7 @@ class LabelTool():
         if len(self.imageList) == 0:
             print('No images found in the specified dir!')
             return
+        self.imageList.sort(key=lambda x: x.split("\\")[-1].split(".")[0])
 
         # default to the 1st image in the collection
         self.cur = 1
