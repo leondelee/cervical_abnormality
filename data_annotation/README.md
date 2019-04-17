@@ -33,3 +33,5 @@ Normally, a GUI window should show up. Type "1" in the input box, which means th
  - merge task trans and task class
  - fix some bugs relating to deletion
 
+### 2019/04/14
+ - more image formats are supported
