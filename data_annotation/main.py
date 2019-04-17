@@ -143,6 +143,8 @@ class LabelTool():
         self.goBtn.pack(side=LEFT)
         self.saveBtn = Button(self.ctrPanel, text='保存修改', width=10, command=self.saveCurrent)
         self.saveBtn.pack(side=LEFT)
+        self.deleteBtn = Button(self.ctrPanel, text='删除\撤销删除', width=10, command=self.DeleteCurrent)
+        self.deleteBtn.pack(side=LEFT)
         self.btnOrigColor = self.saveBtn.cget("background")
 
         self.disp = Label(self.ctrPanel, text='')
@@ -160,7 +162,7 @@ class LabelTool():
         else:
             s = r'D:\workspace\python\labelGUI'
         # get image list
-        self.imageDir = os.path.join(r'.\Images', '%03d' % (self.category))
+        self.imageDir = os.path.join(r'.\Images', '%03d' % self.category)
         self.labelDir = os.path.join(r'.\Labels', '%03d' % self.category)
         if not os.path.exists(self.labelDir):
             os.mkdir(self.labelDir)
@@ -296,11 +298,17 @@ class LabelTool():
         self.json_file_name = os.path.join(self.label_dir, self.imagename + '.json')
         if not os.path.exists(self.json_file_name):
             with open(self.json_file_name, 'w+') as file:
-                file.write(json.dumps({"bbox": [], "class": [],"pre":[]}))
+                file.write(json.dumps({"bbox": [], "class": [],"pre":[],"available":1}))
                 file.close()
         with open(self.json_file_name, 'r+') as file:
             self.json_data = json.loads(file.read())
+            if not "available" in str(self.json_data):
+                self.json_data["available"]=1
             file.close()
+        if self.json_data["available"]==0:
+            self.deleteBtn['text']='撤销删除'
+        else :
+            self.deleteBtn['text']='删除'
 
     def saveImage(self, finished=True):
         import json
@@ -323,7 +331,15 @@ class LabelTool():
                 f.close()
             # print('Image No. %d saved' % (self.cur))
             self.deleteJson()
-
+            
+    def  DeleteCurrent(self):
+        if self.json_data["available"]==0:
+            self.deleteBtn['text']='删除'
+            self.json_data["available"]=1
+        else :
+            self.deleteBtn['text']='撤销删除'
+            self.json_data["available"]=0
+        
     def deleteJson(self):
         delete_flag = True
         for key in self.json_data:
@@ -360,7 +376,6 @@ class LabelTool():
                     for btn in self.class_btns:
                         btn.destroy()
                     self.class_btns = []
-
                 def on_click_label2():
                     self.listbox.insert(END, '({}, {}) -> ({}, {}), {}'.format(x1, y1, x2, y2, CLS_NAME[1]))
                     self.json_data["class"].append([x1, y1, x2, y2, 1])
