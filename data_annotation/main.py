@@ -17,10 +17,11 @@ import os
 import glob
 import random
 import json
+from functools import partial
 
 # colors for the bboxes
-COLORS = ['green', 'yellow', 'red', 'black']
-CLS_NAME = ["正常", "轻微异常", "严重异常", "转化区"]
+COLORS = ['green', 'yellow', 'red', 'black', 'white', 'BurlyWood']
+CLS_NAME = ["正常", "轻微异常", "严重异常", "转化区", "ECC低级别", "ECC高级别"]
 # image sizes for the examples
 SIZE = (1400, 960)
 RESIZE_RATE = 0.8
@@ -178,7 +179,8 @@ class LabelTool():
         if len(self.imageList) == 0:
             print('No images found in the specified dir!')
             return
-        self.imageList.sort(key=lambda x: x.split("\\")[-1].split(".")[0])
+        self.imageList.sort(key=lambda x: int(x.split("\\")[-1].split(".")[0]))
+        print(self.imageList)
 
         # default to the 1st image in the collection
         self.cur = 1
@@ -250,7 +252,6 @@ class LabelTool():
                                                      outline='black')
             self.pre_points.append(tmpId)
 
-   
 
     def task_class(self):
         self.saveCurrent()
@@ -286,6 +287,7 @@ class LabelTool():
         self.img = Image.open(imagepath)
         new_size = (int(self.img.size[0] * RESIZE_RATE), int(self.img.size[1] * RESIZE_RATE))
         self.img = self.img.resize(new_size, Image.ANTIALIAS)
+        print(self.img.size)
         self.tkimg = ImageTk.PhotoImage(self.img)
         self.mainPanel.config(width=max(self.tkimg.width(), 400), height=max(self.tkimg.height(), 400))
         self.mainPanel.create_image(self.img_start_x, self.img_start_y, image=self.tkimg, anchor=NW)
@@ -351,50 +353,19 @@ class LabelTool():
                 x1, x2 = min(self.STATE['x'], event.x), max(self.STATE['x'], event.x)
                 y1, y2 = min(self.STATE['y'], event.y), max(self.STATE['y'], event.y)
 
-                def on_click_label1():
-                    self.listbox.insert(END, '({}, {}) -> ({}, {}), {}'.format(x1, y1, x2, y2, CLS_NAME[0]))
-                    self.json_data["class"].append([x1, y1, x2, y2, 0])
+                def on_click_label(idx):
+                    self.listbox.insert(END, '({}, {}) -> ({}, {}), {}'.format(x1, y1, x2, y2, CLS_NAME[idx]))
+                    self.json_data["class"].append([x1, y1, x2, y2, idx])
                     self.task_class()
                     for btn in self.class_btns:
                         btn.destroy()
                     self.class_btns = []
 
-                def on_click_label2():
-                    self.listbox.insert(END, '({}, {}) -> ({}, {}), {}'.format(x1, y1, x2, y2, CLS_NAME[1]))
-                    self.json_data["class"].append([x1, y1, x2, y2, 1])
-                    self.task_class()
-                    for btn in self.class_btns:
-                        btn.destroy()
-                    self.class_btns = []
+                for idx, clss in enumerate(CLS_NAME):
+                    btn = Button(self.frame, text=CLS_NAME[idx], command=partial(on_click_label, idx))
+                    btn.place(x=x2 + 5, y=y2 + 30 * idx, height=30)
+                    self.class_btns.append(btn)
 
-                def on_click_label3():
-                    self.listbox.insert(END, '({}, {}) -> ({}, {}), {}'.format(x1, y1, x2, y2, CLS_NAME[2]))
-                    self.json_data["class"].append([x1, y1, x2, y2, 2])
-                    self.task_class()
-                    for btn in self.class_btns:
-                        btn.destroy()
-                    self.class_btns = []
-
-                def on_click_label4():
-                    self.listbox.insert(END, '({}, {}) -> ({}, {}), {}'.format(x1, y1, x2, y2, CLS_NAME[3]))
-                    self.json_data["class"].append([x1, y1, x2, y2, 3])
-                    self.task_class()
-                    for btn in self.class_btns:
-                        btn.destroy()
-                    self.class_btns = []
-
-                btn1 = Button(self.frame, text=CLS_NAME[0], command=on_click_label1)
-                btn1.place(x=x2 + 5, y=y2, height=30)
-                self.class_btns.append(btn1)
-                btn2 = Button(self.frame, text=CLS_NAME[1], command=on_click_label2)
-                btn2.place(x=x2 + 5, y=y2 + 30, height=30)
-                self.class_btns.append(btn2)
-                btn3 = Button(self.frame, text=CLS_NAME[2], command=on_click_label3)
-                btn3.place(x=x2 + 5, y=y2 + 30 * 2, height=30)
-                self.class_btns.append(btn3)
-                btn4 = Button(self.frame, text=CLS_NAME[3], command=on_click_label4)
-                btn4.place(x=x2 + 5, y=y2 + 30 * 3, height=30)
-                self.class_btns.append(btn4)
                 self.saveImage(False)
             #                 self.bboxIdList.append(self.bboxId)
             #                 self.bboxId = None
