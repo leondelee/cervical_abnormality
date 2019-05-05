@@ -2,7 +2,7 @@
 This implementation of faster-rcnn is forked from [chenyuntc](https://github.com/chenyuntc/simple-faster-rcnn-pytorch)
 with some small bugs fixed, and some codes about dataset have been adapted to this project. 
 
-To use this code please follow instructions by [chenyuntc](https://github.com/chenyuntc/simple-faster-rcnn-pytorch).
+To use this code please firstly follow instructions by [chenyuntc](https://github.com/chenyuntc/simple-faster-rcnn-pytorch) to make project and download pretrained model.
 
 ## Make our own VOC dataset
 To make our own dataset, three python files are needed: 
