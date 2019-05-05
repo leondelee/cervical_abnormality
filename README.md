@@ -5,11 +5,11 @@ with some small bugs fixed, and some codes about dataset have been adapted to th
 To use this code please firstly follow instructions by [chenyuntc](https://github.com/chenyuntc/simple-faster-rcnn-pytorch) to make project and download pretrained model.
 
 ## Make our own VOC dataset
-To make our own dataset, three python files are needed: 
-xml_generator.ipynb : to changed annotations from json file to xml format
-split_txt_generator.ipynb : to split dataset into trainval and test
+To make our own dataset, three python files are needed: <br>
+xml_generator.ipynb : to changed annotations from json file to xml format<br>
+split_txt_generator.ipynb : to split dataset into trainval and test<br>
 JPEGImages_generator.ipynb : to select images with annotations to train(in the implementation by chenyuntc, train images must have bbox annotation because each train example needs to generate 128 positive anchors)
-
+<br>
 This is an example of dataset file, images and labels are used to store origin data, Annotations,JPEGImages and ImageSets are generated VOC dataset.
 ![images](https://github.com/leondelee/cervical_abnormality/blob/detection/simple-faster-rcnn/misc/voc_file_format.png)
 
