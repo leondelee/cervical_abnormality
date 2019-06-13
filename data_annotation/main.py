@@ -19,9 +19,10 @@ import random
 import json
 from functools import partial
 
+
 # colors for the bboxes
-COLORS = ['green', 'yellow', 'red', 'black', 'white', 'BurlyWood']
-CLS_NAME = ["正常", "轻微异常", "严重异常", "转化区", "ECC低级别", "ECC高级别"]
+COLORS = ['green', 'yellow', 'red', 'black', 'white', 'BurlyWood', 'LimeGreen']
+CLS_NAME = ["正常", "轻微异常", "严重异常", "转化区", "ECC低级别", "ECC高级别", "癌变"]
 # image sizes for the examples
 SIZE = (1400, 960)
 RESIZE_RATE = 0.8
@@ -150,12 +151,40 @@ class LabelTool():
         self.deleteBtn.pack(side=LEFT)
         self.btnOrigColor = self.saveBtn.cget("background")
 
+        # change label
+        self.changelabelBtn = Button(self.ctrPanel, text='修改类别', width=10, command=self.change_label)
+        self.changelabelBtn.pack(side=LEFT)
+
         self.disp = Label(self.ctrPanel, text='')
         self.disp.pack(side=LEFT)
 
         self.frame.columnconfigure(1, weight=1)
         self.frame.rowconfigure(4, weight=1)
         self.json_file_name = ""
+
+    def change_label(self):
+        sel = self.listbox.curselection()
+        if len(sel) != 1:
+            return
+        idx = int(sel[0])
+        tmp = self.json_data["class"][idx]
+        tmpId = self.mainPanel.create_rectangle(tmp[0], tmp[1], tmp[2], tmp[3], width=2,
+                                                outline='DarkGoldenrod')
+        x = tmp[2]
+        y = tmp[3]
+
+        def change(new_label):
+            self.json_data["class"][idx][-1] = new_label
+            for btn in self.class_btns:
+                btn.destroy()
+            self.class_btns = []
+            self.saveImage(False)
+            self.task_class()
+
+        for new_label, clss in enumerate(CLS_NAME):
+            btn = Button(self.frame, text=CLS_NAME[new_label], command=partial(change, new_label))
+            btn.place(x=x + 5, y=y + 30 * new_label, height=30)
+            self.class_btns.append(btn)
 
     def loadDir(self, dbg=False):
         if not dbg:
@@ -172,17 +201,16 @@ class LabelTool():
         self.label_dir = "./Labels/%03d/" % self.category
         if not os.path.exists(self.label_dir):
             os.mkdir(self.label_dir)
-        # load images
+        # load Images
         self.imageList = []
         for format in FORMATS:
             images = glob.glob(os.path.join(self.imageDir, format))
             if len(images):
                 self.imageList.extend(images)
         if len(self.imageList) == 0:
-            print('No images found in the specified dir!')
+            print('No Images found in the specified dir!')
             return
         self.imageList.sort(key=lambda x: int(x.split("\\")[-1].split(".")[0]))
-        print(self.imageList)
 
         # default to the 1st image in the collection
         self.cur = 1
@@ -198,7 +226,7 @@ class LabelTool():
         random.shuffle(filelist)
 
         self.new_picture()
-        print('%d images loaded from %s' % (self.total, s))
+        print('%d Images loaded from %s' % (self.total, s))
 
     def new_picture(self):
         self.task_btn_clear()
@@ -507,6 +535,7 @@ class LabelTool():
         if 1 <= idx and idx <= self.total:
             self.cur = idx
             self.new_picture()
+
 
 
 if __name__ == '__main__':
