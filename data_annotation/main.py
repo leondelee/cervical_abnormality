@@ -149,6 +149,8 @@ class LabelTool():
         self.saveBtn.pack(side=LEFT)
         self.deleteBtn = Button(self.ctrPanel, text='删除\撤销删除', width=10, command=self.DeleteCurrent)
         self.deleteBtn.pack(side=LEFT)
+        self.eccBtn = Button(self.ctrPanel, text='ECC', width=10, command=self.TypeECC)
+        self.eccBtn.pack(side=LEFT)
         self.btnOrigColor = self.saveBtn.cget("background")
 
         # change label
@@ -253,7 +255,6 @@ class LabelTool():
     def task_Pre(self):
         self.saveCurrent()
         self.task_type = self.MODE_PRE
-        self.changeButtonColor()
         self.lb1 = Label(self.frame, text='裁剪区')
         self.lb1.grid(row=3, column=2, sticky=W + N)
         self.task_btns.append(self.lb1)
@@ -300,6 +301,13 @@ class LabelTool():
         self.btnClear.grid(row=6, column=2, sticky=W + E + N)
         self.task_btns.append(self.btnClear)
         self.loadImage()
+        if self.json_data["available"]==0:
+            self.deleteBtn['text']='撤销删除'
+        else :
+            self.deleteBtn['text']='删除'
+        if self.json_data["ECC"]==1:
+            self.eccBtn.configure(bg='red')
+
         # clear panel
         for idx in range(len(self.class_points)):
             self.mainPanel.delete(self.class_points[idx])
@@ -326,17 +334,16 @@ class LabelTool():
         self.json_file_name = os.path.join(self.label_dir, self.imagename + '.json')
         if not os.path.exists(self.json_file_name):
             with open(self.json_file_name, 'w+') as file:
-                file.write(json.dumps({"bbox": [], "class": [],"pre":[],"available":1}))
+                file.write(json.dumps({"bbox": [], "class": [],"pre":[],"available":1,"ECC":0}))
                 file.close()
         with open(self.json_file_name, 'r+') as file:
             self.json_data = json.loads(file.read())
             if not "available" in str(self.json_data):
                 self.json_data["available"]=1
+            if not "ECC" in str(self.json_data):
+                self.json_data["ECC"]=0
             file.close()
-        if self.json_data["available"]==0:
-            self.deleteBtn['text']='撤销删除'
-        else :
-            self.deleteBtn['text']='删除'
+
 
     def saveImage(self, finished=True):
         import json
@@ -367,6 +374,15 @@ class LabelTool():
         else :
             self.deleteBtn['text']='撤销删除'
             self.json_data["available"]=0
+
+
+    def  TypeECC(self):
+        if self.json_data["ECC"]==0:
+            self.json_data["ECC"]=1
+            self.eccBtn.configure(bg='red')
+        else :
+            self.eccBtn.configure(bg=self.btnOrigColor)
+            self.json_data["ECC"]=0
         
     def deleteJson(self):
         delete_flag = True
@@ -383,8 +399,6 @@ class LabelTool():
         elif self.task_type == self.MODE_DEGREE:
             # self.transBtn.configure(bg=self.btnOrigColor)
             self.degreeBtn.configure(bg='red')
-        elif self.task_type == self.MODE_PRE:
-            self.PreBtn.configure(bg=self.btnOrigColor)   
         else:
             # self.transBtn.configure(bg=self.btnOrigColor)
             self.degreeBtn.configure(bg=self.btnOrigColor)
