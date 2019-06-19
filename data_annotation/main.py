@@ -307,6 +307,10 @@ class LabelTool():
             self.deleteBtn['text']='删除'
         if self.json_data["ECC"]==1:
             self.eccBtn.configure(bg='red')
+        else :
+            self.eccBtn.configure(bg=self.btnOrigColor)
+        self.eccBtn.configure(bg='red')
+
 
         # clear panel
         for idx in range(len(self.class_points)):
@@ -342,6 +346,10 @@ class LabelTool():
                 self.json_data["available"]=1
             if not "ECC" in str(self.json_data):
                 self.json_data["ECC"]=0
+            if self.json_data["ECC"] == 1:
+                self.eccBtn.configure(bg='red')
+            else:
+                self.eccBtn.configure(bg=self.btnOrigColor)
             file.close()
 
 
